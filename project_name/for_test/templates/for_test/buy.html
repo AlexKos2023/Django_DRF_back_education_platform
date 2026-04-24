@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Покупка{% endblock %}
+
+{% block content %}
+<h1>Покупка курса</h1>
+<p>Курс: {{ product.name }}</p>
+<p>Цена: {{ product.cost }}</p>
+{% if user.is_authenticated %}
+    <p>Здесь будет оформление покупки.</p>
+{% else %}
+    <p>Сначала нужно <a href="{% url 'login' %}">войти</a>.</p>
+{% endif %}
+{% endblock %}

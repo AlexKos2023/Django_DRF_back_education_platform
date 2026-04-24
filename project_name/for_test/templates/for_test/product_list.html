@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Курсы{% endblock %}
+
+{% block content %}
+<h1>Список курсов</h1>
+
+{% for product in products %}
+    <div style="margin-bottom: 20px;">
+        <h2>{{ product.name }}</h2>
+        <p>Автор: {{ product.creator }}</p>
+        <p>Старт: {{ product.start_date }}</p>
+        <p>Цена: {{ product.cost }}</p>
+        <p>Уроков: {{ product.lessons.count }}</p>
+        <a href="{% url 'buy-product' product.id %}">Купить</a>
+    </div>
+{% empty %}
+    <p>Курсов пока нет</p>
+{% endfor %}
+{% endblock %}
