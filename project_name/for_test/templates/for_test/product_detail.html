@@ -8,39 +8,77 @@
 <p><strong>Автор:</strong> {{ product.creator.username }}</p>
 <p><strong>Старт:</strong> {{ product.start_date|date:"d.m.Y H:i" }}</p>
 <p><strong>Цена:</strong> {{ product.cost }}</p>
-<p><strong>Количество уроков:</strong> {{ product.lessons.count }}</p>
+<p><strong>Минимум в группе:</strong> {{ product.min_group_size }}</p>
+<p><strong>Максимум в группе:</strong> {{ product.max_group_size }}</p>
+
+{% if user.is_superuser or user == product.creator %}
+    <p>
+        <a href="{% url 'lesson-create' product.pk %}">Добавить урок</a> |
+        <a href="{% url 'edit_product' product.pk %}">Редактировать курс</a>
+    </p>
+{% endif %}
+
+{% if has_access %}
+    <p><strong>Доступ:</strong> открыт</p>
+{% else %}
+    <p><strong>Доступ:</strong> ограничен</p>
+{% endif %}
 
 <h2>Уроки</h2>
 
 {% if lessons %}
     {% for lesson in lessons %}
-        <div style="margin-bottom: 20px;">
+        <div style="margin-bottom: 24px; padding: 12px; border: 1px solid #ccc;">
             <h3>{{ lesson.title }}</h3>
             <p>{{ lesson.description }}</p>
 
-            {% if has_access %}
-                <h4>Материалы</h4>
-                {% if lesson.materials.all %}
-                    <ul>
-                        {% for material in lesson.materials.all %}
-                            <li>
-                                <strong>{{ material.title }}</strong>
-                                — {{ material.get_material_type_display }}
-                                {% if material.material_type == 'text' and material.text %}
-                                    <div>{{ material.text }}</div>
-                                {% elif material.file %}
-                                    <a href="{{ material.file.url }}" target="_blank">Открыть файл</a>
-                                {% elif material.url %}
-                                    <a href="{{ material.url }}" target="_blank">Открыть ссылку</a>
+            {% if user.is_superuser or user == product.creator %}
+                <p>
+                    <a href="{% url 'lesson-edit' lesson.pk %}">Редактировать урок</a> |
+                    <a href="{% url 'material-create' lesson.pk %}">Добавить материал</a>
+                </p>
+            {% endif %}
+
+            <h4>Материалы</h4>
+
+            {% if lesson.materials.all %}
+                <ul>
+                    {% for material in lesson.materials.all %}
+                        <li style="margin-bottom: 18px;">
+                            <strong>{{ material.title }}</strong> — {{ material.get_material_type_display }}
+
+                            {% if has_access or user.is_superuser or user == product.creator %}
+                                {% if material.material_type == 'text' %}
+                                    <div style="margin-top: 8px;">{{ material.text|linebreaksbr }}</div>
+                                {% elif material.material_type == 'video' %}
+                                    <div style="margin-top: 8px;">
+                                        {% if material.url %}
+                                            <a href="{{ material.url }}" target="_blank">Открыть видео по ссылке</a>
+                                        {% elif material.file %}
+                                            <a href="{{ material.file.url }}" target="_blank">Открыть видеофайл</a>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <div style="margin-top: 8px;">
+                                        {% if material.file %}
+                                            <a href="{{ material.file.url }}" target="_blank">Открыть файл</a>
+                                        {% endif %}
+                                    </div>
                                 {% endif %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p>Материалов нет.</p>
-                {% endif %}
+                            {% else %}
+                                <div style="margin-top: 8px;">Полный материал доступен после покупки.</div>
+                            {% endif %}
+
+                            {% if user.is_superuser or user == product.creator %}
+                                <div style="margin-top: 8px;">
+                                    <a href="{% url 'material-edit' material.pk %}">Редактировать материал</a>
+                                </div>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
             {% else %}
-                <p>Материалы доступны после покупки.</p>
+                <p>Материалов пока нет.</p>
             {% endif %}
         </div>
     {% endfor %}
@@ -48,7 +86,5 @@
     <p>Уроков пока нет.</p>
 {% endif %}
 
-<p>
-    <a href="{% url 'buy-product' product.pk %}">Купить</a>
-</p>
+<p><a href="{% url 'buy-product' product.pk %}">Купить курс</a></p>
 {% endblock %}

@@ -1,20 +1,19 @@
 {% extends 'base.html' %}
 
-{% block title %}Курсы{% endblock %}
+{% block title %}Товары{% endblock %}
 
 {% block content %}
-<h1>Список курсов</h1>
+<h1>Список товаров</h1>
 
-{% for product in products %}
-    <div style="margin-bottom: 20px;">
-        <h2>{{ product.name }}</h2>
-        <p>Автор: {{ product.creator }}</p>
-        <p>Старт: {{ product.start_date }}</p>
-        <p>Цена: {{ product.cost }}</p>
-        <p>Уроков: {{ product.lessons.count }}</p>
-        <a href="{% url 'buy-product' product.id %}">Купить</a>
-    </div>
-{% empty %}
-    <p>Курсов пока нет</p>
-{% endfor %}
+{% if products %}
+    <ul>
+        {% for product in products %}
+            <li>
+                <a href="{% url 'product-detail' product.pk %}">{{ product.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Товаров пока нет.</p>
+{% endif %}
 {% endblock %}

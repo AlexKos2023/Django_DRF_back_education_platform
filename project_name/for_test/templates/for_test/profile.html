@@ -1,15 +1,50 @@
 {% extends 'base.html' %}
 
-{% block title %}Профиль{% endblock %}
+{% block title %}Личный кабинет{% endblock %}
 
 {% block content %}
-<h1>Профиль пользователя</h1>
+<h1>Личный кабинет</h1>
 
-<p>Логин: {{ user.username }}</p>
-<p>Email: {{ user.email }}</p>
+<p><b>Ник:</b> {{ user.username }}</p>
+<p><b>ФИО:</b> {{ user.get_full_name }}</p>
+<p><b>Email:</b> {{ user.email }}</p>
 
-{% if user.first_name or user.last_name %}
-    <p>Имя: {{ user.first_name }} {{ user.last_name }}</p>
+{% if user.profile.avatar %}
+    <p><img src="{{ user.profile.avatar.url }}" alt="avatar" style="max-width:200px;"></p>
 {% endif %}
 
+<p><a href="{% url 'profile-edit' %}">Редактировать</a></p>
+
+<h2>Мои курсы</h2>
+{% if authored_products %}
+    <ul>
+        {% for product in authored_products %}
+            <li>{{ product.name }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Нет курсов.</p>
+{% endif %}
+
+<h2>Купленные курсы</h2>
+{% if purchased_products %}
+    <ul>
+        {% for product in purchased_products %}
+            <li>{{ product.name }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Нет купленных курсов.</p>
+{% endif %}
+
+<h2>Пройденные курсы</h2>
+{% if completed_products %}
+    <ul>
+        {% for product in completed_products %}
+            <li>{{ product.name }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Нет пройденных курсов.</p>
+{% endif %}
 {% endblock %}
