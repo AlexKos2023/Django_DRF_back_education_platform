@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<h1>{{ product.name }}</h1>
+
+<p><strong>Автор:</strong> {{ product.creator.username }}</p>
+<p><strong>Старт:</strong> {{ product.start_date|date:"d.m.Y H:i" }}</p>
+<p><strong>Цена:</strong> {{ product.cost }}</p>
+<p><strong>Количество уроков:</strong> {{ product.lessons.count }}</p>
+
+<h2>Уроки</h2>
+
+{% if lessons %}
+    {% for lesson in lessons %}
+        <div style="margin-bottom: 20px;">
+            <h3>{{ lesson.title }}</h3>
+            <p>{{ lesson.description }}</p>
+
+            {% if has_access %}
+                <h4>Материалы</h4>
+                {% if lesson.materials.all %}
+                    <ul>
+                        {% for material in lesson.materials.all %}
+                            <li>
+                                <strong>{{ material.title }}</strong>
+                                — {{ material.get_material_type_display }}
+                                {% if material.material_type == 'text' and material.text %}
+                                    <div>{{ material.text }}</div>
+                                {% elif material.file %}
+                                    <a href="{{ material.file.url }}" target="_blank">Открыть файл</a>
+                                {% elif material.url %}
+                                    <a href="{{ material.url }}" target="_blank">Открыть ссылку</a>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Материалов нет.</p>
+                {% endif %}
+            {% else %}
+                <p>Материалы доступны после покупки.</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% else %}
+    <p>Уроков пока нет.</p>
+{% endif %}
+
+<p>
+    <a href="{% url 'buy-product' product.pk %}">Купить</a>
+</p>
+{% endblock %}
